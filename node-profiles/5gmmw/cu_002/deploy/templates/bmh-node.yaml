@@ -1,0 +1,30 @@
+apiVersion: metal3.io/v1alpha1
+kind: BareMetalHost
+metadata:
+  name: bmh-{{ $.Values.cluster.name }}-{{ $.Values.node.site }}-{{ $.Values.node.name }}
+  namespace: {{ $.Values.mgmt.ai.namespace }}
+  labels:
+    # InfraEnv to use
+    infraenvs.agent-install.openshift.io: "infraenv-{{ $.Values.cluster.name }}"
+  annotations:
+    bmac.agent-install.openshift.io/role: {{ $.Values.node.role | default "worker" }}
+    bmac.agent-install.openshift.io/hostname: "{{ $.Values.node.name }}"
+    inspect.metal3.io: disabled
+spec:
+  online: True
+  externallyProvisioned: {{ $.Values.node.externallyProvisioned | default "False" }}
+{{- range $index, $int := $.Values.node.interfaces }}
+  {{- if eq $index 0 }}  
+  bootMACAddress: {{ $int.mac }}
+  {{- end }}
+{{- end }}
+  automatedCleaningMode: disabled
+  # Depricated
+  hardwareProfile: unknown
+  rootDeviceHints: 
+    deviceName: {{ $.Values.node.boot_dev_hint | quote }}
+  bmc:
+    address: {{ $.Values.node.bmc_address }}
+    credentialsName: bmc-{{ $.Values.cluster.name }}-{{ $.Values.node.site }}-{{ $.Values.node.name }}
+    disableCertificateVerification: True
+---

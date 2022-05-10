@@ -1,0 +1,23 @@
+---
+###############################################################################
+# Backhaul - VF type vfio
+apiVersion: sriovnetwork.openshift.io/v1
+kind: SriovNetworkNodePolicy
+metadata:
+  name: oran-bh-vfio
+  namespace: openshift-sriov-network-operator
+spec:
+  resourceName: oran_bh_vfio
+  nodeSelector:
+    ran.openshift.io/sriov: ""
+    ran.openshift.io/oran-bh-vfio: ""
+  deviceType: vfio-pci
+  priority: 10
+  #mtu: 1500
+  numVfs: 27
+  #lspci -nn | grep -i 'Ethernet Controller' 
+  nicSelector:
+    vendor: "8086"
+    deviceID: "1572"
+    pfNames:
+      - enp1s0f1#4-26
